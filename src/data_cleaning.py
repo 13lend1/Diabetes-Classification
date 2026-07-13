@@ -3,7 +3,7 @@ import numpy as np
 from data_investigation import cardinality,featureType
 from helperFunc import saveFile
 
-PATH='data/clean/Diabetes Classfier Clean'
+PATH='data/clean/Diabetes Classifier Clean.csv'
 
 df=pd.read_csv("data/raw/Diabetes Classification.csv")
 df=df.copy()
