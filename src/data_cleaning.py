@@ -20,4 +20,6 @@ num,cat=featureType(df)
 cardinality(cat,df) 
 
 df=df.drop(['Unnamed: 0'],axis=1)
+
+
 saveFile(df,PATH)
