@@ -27,7 +27,7 @@ nullCheck(df) #as in the datset description the dataset has no missing values
 # divide numerical and categorical features
 def featureType(df):
     numerical=df.select_dtypes(include=[np.number]).columns
-    categorical=df.select_dtypes(include='str').columns
+    categorical=df.select_dtypes(include='object').columns
     return numerical,categorical
 
 numerical,categorical=featureType(df)
