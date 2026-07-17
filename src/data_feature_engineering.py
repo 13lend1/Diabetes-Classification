@@ -30,22 +30,22 @@ def features(X):
     X['BMI/HDL']=X['BMI']/(X['HDL']+eps)
     X['BMI/LDL']=X['BMI']/(X['LDL']+eps)
     X['BMI/HDL+LDL']=X['BMI']/(X['LDL']+X['HDL']+eps)
+    
+    X_scaled=scale(X)
+
+    kmeans=KMeans(n_clusters=6,n_init=10,random_state=42)
+    kmeans.fit(X_scaled)
+    # X['cluster_labels']=kmeans.labels_
+    X['Gender']=gender
+
+    distance=kmeans.transform(X_scaled)
+
+    for i in range (distance.shape[1]):
+        X[f'Cluster {i}']=distance[:,i]
+    
     return X
 
 X=features(X)
-
-
-X_scaled=scale(X)
-
-kmeans=KMeans(n_clusters=6,n_init=10,random_state=42)
-kmeans.fit(X_scaled)
-# X['cluster_labels']=kmeans.labels_
-X['Gender']=gender
-
-distance=kmeans.transform(X_scaled)
-
-for i in range (distance.shape[1]):
-    X[f'Cluster {i}']=distance[:,i]
 
 features= X.columns
 
