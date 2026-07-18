@@ -1,25 +1,21 @@
 import pandas as pd
 import numpy as np
-from data_investigation import cardinality,featureType
-from helperFunc import saveFile
 
-PATH='data/clean/Diabetes Classifier Clean.csv'
 
-df=pd.read_csv("data/raw/Diabetes Classification.csv")
-df=df.copy()
-print(df.shape)
+def uncapitalize(df:pd.DataFrame)->pd.DataFrame:
+    df.columns=df.columns.str.lower()
+    return df
 
-# drop duplicates/if any
-df=df.drop_duplicates()
-print(df.shape)
+def drop_duplicates(df:pd.DataFrame)->pd.DataFrame:
+    df.drop_duplicates(inplace=True)
+    return df
 
 #fixing small 'f' gender issue
-df['Gender']=df['Gender'].apply(lambda x: 'F' if x=='f' else x)
+def gender_fix(df:pd.DataFrame,col='gender')->pd.DataFrame:
+    df[col]=df[col].apply(lambda x: 'F' if x=='f' else x)
+    return df
 
-num,cat=featureType(df)
-cardinality(cat,df) 
+def drop_col(df:pd.DataFrame,col='unnamed: 0')->pd.DataFrame:
+    df.drop([col],axis=1,inplace=True)
+    return df
 
-df=df.drop(['Unnamed: 0'],axis=1)
-
-
-saveFile(df,PATH)
