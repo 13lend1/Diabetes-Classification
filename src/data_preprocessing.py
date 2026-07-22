@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np 
 from sklearn.preprocessing import LabelEncoder,StandardScaler
 
-def encode(df,col='Gender'):
+def encode(df,col='gender'):
     le=LabelEncoder()
     df[col]=le.fit_transform(df[col])
     return df
