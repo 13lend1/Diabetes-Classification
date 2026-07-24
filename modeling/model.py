@@ -1,4 +1,3 @@
-
 import numpy as np
 from sklearn.model_selection import cross_validate
 from sklearn.base import BaseEstimator
@@ -30,19 +29,21 @@ class ModelMetrics:
 class Agent:
     def __init__(self,model:BaseEstimator):
         self.model=model
+        self.parameters=dict
         self.X=pd.DataFrame
-        self.y=None
+        self.y=pd.Series
         
-    def train_eval(self,X:np.ndarray,y:np.ndarray,k:int=5)->ModelMetrics:
+    def set_params(self,params:dict)->None:
+        self.model.set_params(params)
+        
+    def train(self,X:pd.DataFrame,y:pd.Series)->None:
+        self.model.fit(X,y)
+        
+    def evaluation(self,X:np.ndarray,y:np.ndarray,k:int=5)->ModelMetrics:
         scoring_metrics = ['accuracy', 'precision_macro', 'recall_macro', 'f1_macro']
         results=cross_validate(self.model,X,y,cv=k,scoring=scoring_metrics)
         self.model.fit(X,y)
         return ModelMetrics(results)
 
-    def train_eval2(self,model:BaseEstimator,X:np.ndarray,y:np.ndarray,k:int=5)->ModelMetrics:
-        scoring_metrics = ['accuracy', 'precision_macro', 'recall_macro', 'f1_macro']
-        results=cross_validate(model,X,y,cv=k,scoring=scoring_metrics)
-        self.model.fit(X,y)
-        return ModelMetrics(results)
 
             

@@ -18,7 +18,7 @@ def features(X:pd.DataFrame,gender:pd.Series)->pd.DataFrame:
 
     kmeans=KMeans(n_clusters=6,n_init=10,random_state=42)
     kmeans.fit(X_scaled)
-    # X['cluster_labels']=kmeans.labels_
+    X['cluster_labels']=kmeans.labels_
     X['gender']=gender
 
     distance=kmeans.transform(X_scaled)
