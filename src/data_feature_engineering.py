@@ -2,8 +2,6 @@ import pandas as pd
 from src.data_preprocessing import scale
 from sklearn.cluster import KMeans
 
-
-
 def features(X:pd.DataFrame,gender:pd.Series)->pd.DataFrame:
     eps = 1e-8
     X['lipids']=X['hdl']/(X['ldl']+eps)
