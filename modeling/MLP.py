@@ -10,12 +10,17 @@ class MLP(Agent):
     def __init__(self):
         super().__init__(MODEL)
         
-    def scaling(self, X: pd.DataFrame, y: pd.Series):
+    def scaling(self, X: pd.DataFrame,test:pd.DataFrame):
         scaler = StandardScaler().set_output(transform="pandas")
-        
+        gender=X['gender']
+        X.drop('gender',axis=1)
         X = scaler.fit_transform(X)
-
-        return X, y
+        pd.concat([X,gender],axis=1)
+        
+        gender_test=test['gender']
+        test=scaler.fit_transform(test)
+        pd.concat([test,gender_test],axis=1)
+        return X.reset_index(drop=True),test.reset_index(drop=True)
             
     def hyperparameter_tuning(self,X:np.ndarray,y:np.ndarray,trials:int)->dict:
         def objective(trial):
