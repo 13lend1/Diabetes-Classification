@@ -3,7 +3,7 @@ from sklearn.model_selection import cross_validate
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score
+from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score,balanced_accuracy_score
 from dataclasses import dataclass
 from sklearn.base import clone
 import pandas as pd
@@ -12,6 +12,7 @@ import pandas as pd
 @dataclass
 class ModelMetrics:
     accuracy:np.ndarray
+    balanced_accuracy:np.ndarray
     precision:np.ndarray
     f1:np.ndarray
     recall: np.ndarray
@@ -21,10 +22,12 @@ class ModelMetrics:
     
     def __init__(self, metrics: dict):
         self.accuracy = metrics['test_accuracy']
-        self.precision = metrics['test_precision_macro']
-        self.f1 = metrics['test_f1_macro']
-        self.recall = metrics['test_recall_macro']
+        self.balanced_accuracy=metrics['test_balanced_accuracy']
+        self.precision = metrics['test_precision']
+        self.f1 = metrics['test_f1']
+        self.recall = metrics['test_recall']
         self.roc_auc=metrics['test_roc_auc']
+        
         
     def measure(self,y_pred:np.ndarray,y_real:np.ndarray):
         self.accuracy=accuracy_score(y_real,y_pred)
@@ -32,12 +35,14 @@ class ModelMetrics:
         self.f1=f1_score(y_real,y_pred)
         self.recall=recall_score(y_real,y_pred)
         self.roc_auc=roc_auc_score(y_real,y_pred)
+        self.balanced_accuracy=balanced_accuracy_score(y_real,y_pred)
 
     def out(self):
         print(f"Accuracy: {self.accuracy.mean()}")
         print(f"Precision: {self.precision.mean()}")
         print(f"F1: {self.f1.mean()}")
         print(f"Recall: {self.recall.mean()}")
+        print(f"Balanced Accuracy:{self.balanced_accuracy.mean()}")
         print(f"ROC-AUC: {self.roc_auc.mean()}")
                                 
     
@@ -143,7 +148,7 @@ class Agent:
         )
     def evaluation(self,X:np.ndarray,y:np.ndarray,k:int=5)->ModelMetrics:
         skf=StratifiedKFold(n_splits=k,shuffle=True,random_state=42)
-        scoring_metrics = ['accuracy', 'precision_macro', 'recall_macro', 'f1_macro','roc_auc']
+        scoring_metrics = ['accuracy','balanced_accuracy', 'precision', 'recall', 'f1','roc_auc']
         results=cross_validate(self.model,X,y,cv=skf,scoring=scoring_metrics)
         return ModelMetrics(results)
 

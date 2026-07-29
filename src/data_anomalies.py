@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np 
+from sklearn.preprocessing import RobustScaler
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
+from sklearn.impute import KNNImputer
 
 RANDOM_STATE=42
 def outliersCheck(df: pd.DataFrame) -> set:
@@ -29,4 +31,20 @@ def outliersCheck(df: pd.DataFrame) -> set:
     index.update(lof_anomalies_idx)  
 
     return iso_anomalies.index,lof_anomalies_idx
+
+def anomaly_imputer(df:pd.DataFrame)->pd.DataFrame:
+    df = df.copy()  
+    feature_cols = df.columns  
+
+    scaler = RobustScaler()
+    df_scaled = scaler.fit_transform(df)
+    df_sc = pd.DataFrame(df_scaled, columns=feature_cols, index=df.index)
+
+    imputer = KNNImputer(n_neighbors=5)
+    df_imputed = imputer.fit_transform(df_sc)
+    df_imp = pd.DataFrame(df_imputed, columns=feature_cols, index=df.index)
+
+    df_f = scaler.inverse_transform(df_imputed)
+    df_final=pd.DataFrame(df_f,columns=feature_cols,index=df.index)
+    return df_final
 
