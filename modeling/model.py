@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.model_selection import cross_validate
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import StratifiedKFold
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler,OneHotEncoder
 from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score,roc_auc_score,balanced_accuracy_score
 from dataclasses import dataclass
 from sklearn.base import clone
@@ -44,7 +44,16 @@ class ModelMetrics:
         print(f"Recall: {self.recall.mean()}")
         print(f"Balanced Accuracy:{self.balanced_accuracy.mean()}")
         print(f"ROC-AUC: {self.roc_auc.mean()}")
-                                
+                     
+    def values(self) -> dict:
+        return {
+            "accuracy": self.accuracy.mean(),
+            "precision": self.precision.mean(),
+            "f1": self.f1.mean(),
+            "recall": self.recall.mean(),
+            "balanced_accuracy": self.balanced_accuracy.mean(),
+            "roc_auc": self.roc_auc.mean(),
+        }         
     
     
 
@@ -54,6 +63,7 @@ class Agent:
         self.parameters=dict
         self.X=pd.DataFrame
         self.y=pd.Series
+
         
     def set_params(self,params:dict)->None:
         self.model.set_params(**params)

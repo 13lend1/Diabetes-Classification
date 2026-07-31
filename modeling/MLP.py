@@ -4,24 +4,35 @@ from .model import Agent
 import pandas as pd
 import numpy as np
 import joblib
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler,OneHotEncoder
 MODEL=MLPClassifier()
 class MLP(Agent):
     def __init__(self):
         super().__init__(MODEL)
         
-    def scaling(self, X: pd.DataFrame,test:pd.DataFrame):
+    def scaling(self, X: pd.DataFrame, test: pd.DataFrame, flag_col: str = "flag"):
         scaler = StandardScaler().set_output(transform="pandas")
-        gender=X[['gender']]
-        X=X.drop('gender',axis=1)
-        X = scaler.fit_transform(X)
-        X=pd.concat([X,gender],axis=1)
-        
-        gender_test=test[['gender']]
-        test=test.drop('gender',axis=1)
-        test=scaler.fit_transform(test)
-        test=pd.concat([test,gender_test],axis=1)
-        return X.reset_index(drop=True),test.reset_index(drop=True)
+        ohe = OneHotEncoder(sparse_output=False, drop="first").set_output(transform="pandas")
+
+        # separate categorical columns
+        X_cat = X[['gender', flag_col]]
+        X_num = X.drop(['gender', flag_col], axis=1)
+
+        test_cat = test[['gender', flag_col]]
+        test_num = test.drop(['gender', flag_col], axis=1)
+
+        # fit scaler on train only, apply to both
+        X_num = scaler.fit_transform(X_num)
+        test_num = scaler.transform(test_num)
+
+        # fit OHE on train only, apply to both
+        X_cat_enc = ohe.fit_transform(X_cat)
+        test_cat_enc = ohe.transform(test_cat)
+
+        X_final = pd.concat([X_num, X_cat_enc], axis=1)
+        test_final = pd.concat([test_num, test_cat_enc], axis=1)
+
+        return X_final.reset_index(drop=True), test_final.reset_index(drop=True)
             
     def hyperparameter_tuning(self,X:np.ndarray,y:np.ndarray,trials:int)->dict:
         def objective(trial):
