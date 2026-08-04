@@ -13,16 +13,16 @@ def scale(df):
     df_numeric=scaler.fit_transform(df_numeric)
     return df_numeric
 
-def scaling(X: pd.DataFrame, test: pd.DataFrame, flag_col: str = "anomaly_score"):
+def scaling(X: pd.DataFrame, test: pd.DataFrame):
     scaler = StandardScaler().set_output(transform="pandas")
     ohe = OneHotEncoder(sparse_output=False, drop="first").set_output(transform="pandas")
 
     # separate categorical columns
-    X_cat = X[['gender', flag_col]]
-    X_num = X.drop(['gender', flag_col], axis=1)
+    X_cat = X[['gender']]
+    X_num = X.drop(['gender'], axis=1)
 
-    test_cat = test[['gender', flag_col]]
-    test_num = test.drop(['gender', flag_col], axis=1)
+    test_cat = test[['gender' ]]
+    test_num = test.drop(['gender'], axis=1)
 
     # fit scaler on train only, apply to both
     X_num = scaler.fit_transform(X_num)

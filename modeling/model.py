@@ -38,12 +38,13 @@ class ModelMetrics:
         self.balanced_accuracy=balanced_accuracy_score(y_real,y_pred)
 
     def out(self):
-        print(f"Accuracy: {self.accuracy.mean()}")
-        print(f"Precision: {self.precision.mean()}")
-        print(f"F1: {self.f1.mean()}")
-        print(f"Recall: {self.recall.mean()}")
-        print(f"Balanced Accuracy:{self.balanced_accuracy.mean()}")
-        print(f"ROC-AUC: {self.roc_auc.mean()}")
+        print(f"Accuracy: {self.accuracy.mean()}, std: {self.accuracy.std()}")
+        print(f"Precision: {self.precision.mean()}, std: {self.precision.std()}")
+        print(f"F1: {self.f1.mean()}, std: {self.f1.std()}")
+        print(f"Recall: {self.recall.mean()}, std: {self.recall.std()}")
+        print(f"Balanced Accuracy:{self.balanced_accuracy.mean()}, std: {self.balanced_accuracy.std()}")
+        print(f"ROC-AUC: {self.roc_auc.mean()}, std: {self.roc_auc.std()}")
+        
                      
     def values(self) -> dict:
         return {

@@ -6,14 +6,87 @@ from src.data_feature_engineering import features
 from sklearn.model_selection import train_test_split
 import joblib
 from modeling.model import Agent
+from sklearn.model_selection import cross_val_score
 from sklearn.metrics import f1_score,recall_score,precision_score,balanced_accuracy_score,roc_auc_score,accuracy_score
+import optuna 
 
 MODEL=LogisticRegression()
 
 class LR(Agent):
     def __init__(self):
         super().__init__(MODEL)
-        
+    
+    def tune_logistic_regression(self,X, y, trials=100):
+
+        def objective(trial):
+
+            penalty = trial.suggest_categorical(
+                "penalty",
+                ["l1", "l2", "elasticnet"]
+            )
+
+            if penalty == "elasticnet":
+                l1_ratio = trial.suggest_float(
+                    "l1_ratio",
+                    0.0,
+                    1.0
+                )
+            else:
+                l1_ratio = None
+
+            if penalty == "none":
+                C = 1.0
+            else:
+                C = trial.suggest_float(
+                    "C",
+                    1e-4,
+                    1e3,
+                    log=True
+                )
+
+            class_weight = trial.suggest_categorical(
+                "class_weight",
+                [None, "balanced"]
+            )
+
+            solver_map = {
+                "l1": "liblinear",
+                "l2": "lbfgs",
+                "elasticnet": "saga",
+                "none": "lbfgs"
+            }
+
+            model = LogisticRegression(
+                penalty=penalty,
+                C=C,
+                class_weight=class_weight,
+                solver=solver_map[penalty],
+                l1_ratio=l1_ratio,
+                max_iter=5000,
+                random_state=42
+            )
+
+            score = cross_val_score(
+                model,
+                X,
+                y,
+                cv=5,
+                scoring="f1"
+            ).mean()
+
+            return score
+
+
+        study = optuna.create_study(
+            direction="maximize"
+        )
+
+        study.optimize(
+            objective,
+            n_trials=trials
+        )
+
+        return study.best_params
                     
     def feature_importance(self,cols)->None:
         feature_cols=cols

@@ -97,7 +97,7 @@ class MLP(Agent):
             print(params)
             score.out()
 
-            return score.roc_auc.mean()
+            return score.accuracy.mean()
 
 
         study = optuna.create_study(direction="maximize")

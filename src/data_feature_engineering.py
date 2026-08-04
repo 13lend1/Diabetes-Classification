@@ -15,6 +15,7 @@ def features(X_train: pd.DataFrame, X_test: pd.DataFrame):
         X['BMI/HDL+LDL'] = X['bmi'] / (X['ldl'] + X['hdl'] + eps)
         X['bun_x_cr'] = X['cr'] * X['bun']
         X['chol/ldl'] = X['chol'] / (X['ldl'] + eps)
+        
 
     gender_train = X_train[['gender']]
     gender_test = X_test[['gender']]
@@ -25,7 +26,7 @@ def features(X_train: pd.DataFrame, X_test: pd.DataFrame):
     X_train_scaled = scaler.fit_transform(X_train)   
     X_test_scaled = scaler.transform(X_test)         
 
-    kmeans = KMeans(n_clusters=6, n_init=10, random_state=42)
+    kmeans = KMeans(n_clusters=3, n_init=15, random_state=42)
     kmeans.fit(X_train_scaled)                         # fit on train only
 
     X_train['cluster_labels'] = kmeans.labels_
