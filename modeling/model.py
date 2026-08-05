@@ -104,7 +104,7 @@ class Agent:
             y_tr = y_train.iloc[train_idx]
 
             # Scale only KNN and MLP
-            if name in ["knn", "mlp"]:
+            if name in ["knn", "MLP"]:
 
                 gender_tr = X_tr["gender"]
                 gender_val = X_val["gender"]

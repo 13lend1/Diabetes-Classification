@@ -113,66 +113,96 @@ class StackingEnsemble:
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             self.X, self.y,test_size=0.2, random_state=42
         )
-        
+        self.X_train_copy=self.X_train.copy()
         self.X_train,self.X_test=features(self.X_train,self.X_test)
         self.X_train_scaled,self.X_test_scaled=scaling(self.X_train,self.X_test)
         self.meta_train = None
         self.meta_test = None
         
-    def build_meta_features(self, k=10, random_state=42):
+    def build_meta_features(self, random_state=42, use_features=False):
         train_parts, test_parts = [], []
+
         for agent in self.base_agents:
             oof_df, test_df = agent.oof(
-                self.X_train, self.y_train, self.X_test,
-                name=agent.__class__.__name__, k=k, random_state=random_state
+                self.X_train,
+                self.y_train,
+                self.X_test,
+                name=agent.__class__.__name__,
+                k=self.oof_folds,
+                random_state=random_state
             )
-            oof_df = oof_df.rename(columns={f"{agent.__class__.__name__}_oof": f"{agent.__class__.__name__}_pred"})
-            test_df = test_df.rename(columns={f"{agent.__class__.__name__}_test": f"{agent.__class__.__name__}_pred"})
+
+            oof_df = oof_df.rename(
+                columns={f"{agent.__class__.__name__}_oof": f"{agent.__class__.__name__}_pred"}
+            )
+
+            test_df = test_df.rename(
+                columns={f"{agent.__class__.__name__}_test": f"{agent.__class__.__name__}_pred"}
+            )
 
             train_parts.append(oof_df)
             test_parts.append(test_df)
 
-        train_parts.append(self.X_train_scaled.reset_index(drop=True))
-        test_parts.append(self.X_test_scaled.reset_index(drop=True))
+        # Add original features if enabled
+        if use_features:
+            train_parts.append(self.X_train_scaled.reset_index(drop=True))
+            test_parts.append(self.X_test_scaled.reset_index(drop=True))
 
         self.meta_train = pd.concat(train_parts, axis=1)
         self.meta_train.index = self.X_train.index
 
         self.meta_test = pd.concat(test_parts, axis=1)
         self.meta_test.index = self.X_test.index
-
+        print(self.meta_train)
         return self.meta_train, self.meta_test
 
     def fit_base_models(self):
         # final models used for deployment inference — full X_train, no OOF
         for agent in self.base_agents:
             X_input = self.X_train if agent.__class__.__name__ in self.scale_resistant_models else self.X_train
-            agent.train(X_input)
+            agent.train(X_input,self.y_train)
 
     def fit_meta_model(self):
         if self.meta_train is None:
             self.build_meta_features()
         self.meta_feature_names = list(self.meta_train.columns)
         self.meta_model.train(self.meta_train, self.y_train)
-        print(self.meta_train)
-        print(self.y_train)
-        print(self.meta_train.shape)
-        print(self.y_train.shape)
+
 
     def predict_proba(self):
         if self.meta_test is None:
             self.build_meta_features()
-            print(f"{self.meta_test.columns} $and$ {self.meta_feature_names}")
+
         assert list(self.meta_test.columns) == self.meta_feature_names, "Column mismatch!"
         return self.meta_model.predict_proba(self.meta_test)
     
     def predict(self):
         if self.meta_test is None:
             self.build_meta_features()
-        print(f"{self.meta_test.columns} $and$ {self.meta_feature_names}")
+       
         assert list(self.meta_test.columns) == self.meta_feature_names, "Column mismatch!"
         return self.meta_model.predict(self.meta_test)
     
+
+    def predict_single(self, row: pd.DataFrame) -> str:
+        _,row= features(self.X_train_copy,row)
+        _,row= scaling(self.X_train,row)
+        row=row.rename(columns={'gender_1':'gender'})
+        meta_features = {}
+
+        for agent in self.base_agents:
+            if agent.__class__.__name__ in self.scale_resistant_models:
+                pred = agent.predict_proba(row)[:, 1]
+            else:
+                pred = agent.predict_proba(row)[:, 1]
+
+            meta_features[f"{agent.__class__.__name__}_pred"] = pred
+
+        meta_row = pd.DataFrame(meta_features)
+        pred = self.meta_model.predict(meta_row)[0]
+
+        return "You don't have diabetes!" if pred == 0 else "You have diabetes!"
+        
     def measure(self):
         metrics = {}
         self.fit_meta_model()
@@ -186,3 +216,13 @@ class StackingEnsemble:
         metrics['recall'] = recall_score(y_real, y_pred)
         metrics['roc_auc'] = roc_auc_score(y_real, y_proba[:,1])
         print(metrics)
+        
+    def cv(self,n:int):
+        if self.meta_train is None:
+            self.build_meta_features()
+        metrics=self.meta_model.evaluation(self.meta_train,self.y_train,n)
+        return metrics
+    
+    def save(self, path="stacking_model.pkl"):
+        joblib.dump(self, path)
+        print(f"Stacking ensemble saved to {path}")
