@@ -23,10 +23,9 @@ def outliersCheck(df: pd.DataFrame) -> set:
     lof = LocalOutlierFactor(n_neighbors=20, contamination=0.05)
     df['lof_anomalies'] = lof.fit_predict(features)
     lof_anomalies_idx = df[df['lof_anomalies'] == -1].index
+    
     print("LOF:")
-    print(df.loc[lof_anomalies_idx, 'lof_anomalies'])
-    print(lof_anomalies_idx.shape)
-    print()
+    print(lof_anomalies_idx)
 
     index.update(lof_anomalies_idx)  
 

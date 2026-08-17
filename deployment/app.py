@@ -7,11 +7,8 @@ from pathlib import Path
 from dataclasses import dataclass
 import pandas as pd
 import numpy as np 
-from sklearn.linear_model import LogisticRegression
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from modeling.Ensemble import StackingEnsemble
-from sklearn.model_selection import train_test_split
 import joblib 
 import pandas, sklearn, xgboost
 print(pandas.__version__, sklearn.__version__, xgboost.__version__)
@@ -35,20 +32,8 @@ class DiabetesPredictor:
     def _prepare_data(self):
         self.df=pd.read_csv(self.config.EXPORT_PATH)
         
-    def predict(
-    self,
-    age,
-    gender,
-    bmi,
-    chol,
-    tg,
-    hdl,
-    ldl,
-    cr,
-    bun,
-        ):
+    def predict(self,age,gender,bmi,chol,tg,hdl,ldl,cr,bun):
         gender = 1 if gender == "M" else 0
-
         inputs = {
             "age": age,
             "gender": gender,
@@ -73,13 +58,13 @@ class DiabetesPredictorUI:
         inputs = [
             gr.Number(label="Age"),
             gr.Radio(["M", "F"], label="Gender"),
-            gr.Number(label="BMI"),
-            gr.Number(label="Cholesterol"),
-            gr.Number(label="Triglycerides"),
-            gr.Number(label="HDL"),
-            gr.Number(label="LDL"),
-            gr.Number(label="Creatinine"),
-            gr.Number(label="BUN"),
+            gr.Number(label="BMI(mmol/L)"),
+            gr.Number(label="Cholesterol(mmol/L)"),
+            gr.Number(label="Triglycerides(mmol/L)"),
+            gr.Number(label="HDL(mmol/L)"),
+            gr.Number(label="LDL(mmol/L)"),
+            gr.Number(label="Creatinine(µmol/L)"),
+            gr.Number(label="BUN(mmol/L)"),
                 ]    
         return gr.Interface(
             fn=self.predictor.predict,

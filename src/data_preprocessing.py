@@ -37,20 +37,3 @@ def scaling(X: pd.DataFrame, test: pd.DataFrame):
 
     return X_final.reset_index(drop=True), test_final.reset_index(drop=True)
 
-# def scaling(X: pd.DataFrame,flag_col: str = "anomaly_score"):
-#     scaler = StandardScaler().set_output(transform="pandas")
-#     ohe = OneHotEncoder(sparse_output=False, drop="first").set_output(transform="pandas")
-
-#     # separate categorical columns
-#     X_cat = X[['gender', flag_col]]
-#     X_num = X.drop(['gender', flag_col], axis=1)
-
-
-#     # fit scaler on train only, apply to both
-#     X_num = scaler.fit_transform(X_num)
-
-#     # fit OHE on train only, apply to both
-#     X_cat_enc = ohe.fit_transform(X_cat)
-
-#     X_final = pd.concat([X_num, X_cat_enc], axis=1)
-#     return X_final.reset_index(drop=True)

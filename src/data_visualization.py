@@ -55,9 +55,9 @@ def badFats(ldl):
         return "Over 3"
     
 def creatinine(cr):
-    if cr['gender']=='F' and cr['cr']>45 and cr['cr']<90:
+    if cr['gender']==0 and cr['cr']>45 and cr['cr']<90:
         return "Healthy"
-    elif cr['gender']=='M' and cr['cr']>60 and cr['cr']<115:
+    elif cr['gender']==1 and cr['cr']>60 and cr['cr']<115:
         return "Healthy"
     else:
         return "Unhealthy"
