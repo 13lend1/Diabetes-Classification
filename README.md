@@ -45,7 +45,7 @@ After you run the file, a link will appear in your terminal. Open it in your def
 
 ## Pipeline
 
-> **Note:** The notebooks were developed and run using an Anaconda environment/kernel, separate from the Gradio deployment `.venv`. To run them yourself, set up an Anaconda environment and select it as the Jupyter kernel before opening the notebooks.
+> **Note:** The notebooks were developed and run using an Anaconda environment/kernel, separate from the Gradio deployment `.venv`. To run them yourself, set up an Anaconda environment and select it as the Python environment before opening the notebooks.
 
 I highly recommend having a look at the `notebooks` folder, where you can see the whole pipeline:
 
