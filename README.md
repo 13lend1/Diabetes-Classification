@@ -2,6 +2,8 @@
 
 My first end-to-end Machine Learning project that predicts diabetes based on blood panel results!
 
+Disclaimer: This project is for educational purposes only and is not intended for medical use. It has not been clinically validated and should not be used to make real health decisions. Consult a qualified healthcare professional for medical advice.
+
 ## About the project
 
 - The project is done for gaining experience and training my personal ML skills.
