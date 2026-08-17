@@ -1,22 +1,20 @@
 
 import gradio as gr
 import joblib
-import pandas as pd
-import numpy as np 
 from pathlib import Path
 from dataclasses import dataclass
 import pandas as pd
 import numpy as np 
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from src.configuration import CLEAN_DATA,MODEL_PATH
 import joblib 
-import pandas, sklearn, xgboost
-print(pandas.__version__, sklearn.__version__, xgboost.__version__)
 
+CLEAN_DATA=CLEAN_DATA.lstrip("..\\")
 @dataclass
 class Config:
-    MODEL_PATH:Path=Path("models\StackEnsemble.pkl")
-    EXPORT_PATH:Path=Path("data\clean\clean.csv")
+    MODEL_PATH:Path=Path(MODEL_PATH)
+    EXPORT_PATH:Path=Path(CLEAN_DATA)
     
 
 
